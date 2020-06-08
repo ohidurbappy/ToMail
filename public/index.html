@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToMail - Get Mail from the web</title>
+
+    <style>
+
+        body{
+            padding: 0;
+            margin: 0;
+            font-family: sans-serif;
+        }
+        input[type=text],input[type=email],textarea{
+            width:100%;
+            padding: 4px;
+            border-radius: 2px;
+            background-color: white;
+            border: black 1px solid;
+        }
+
+        input[type=submit]{
+            margin:12px 0;
+            padding: 8px 20px;
+            font-size: 16px;
+            font-weight: 900;
+            background-color: darkslategrey;
+            box-sizing: border-box;
+            color: white;
+            border: 2px black solid;
+        }
+
+        label{
+            font-size: 14px;
+            font-weight: 700;
+
+        }
+
+        .content{
+            margin:auto;
+            padding:24px;
+        }
+        .contact-form{
+            background-color: #ccc;
+            border-radius: 8px;
+            padding:20px 20px;
+            margin:auto;
+            min-width: 270px;
+            max-width: 700px;
+
+            
+        }
+
+        .header{
+            padding: 20px;
+            margin-top:0 ;
+            background-color: #161616;
+            color: white;
+        }
+
+        .api{
+            color: black;
+            background-color:#fff384;
+            padding: 20px;
+            margin:24px auto;
+            border-radius: 20px;
+            min-width: 270px;
+            max-width: 700px;
+
+        }
+
+        .footer{
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            background-color: #0c0c0c;
+            color: white;
+        }
+
+
+    </style>
+</head>
+<body>
+    
+    <div class="header">
+        <h1>ToMail</h1>
+        <h4>Get Email via api</h4>
+    </div>
+
+    <div class="content">
+        
+        <div class="contact-form">
+            <h4>Sample Form</h4>
+        <form action="/send" method="POST">
+        
+            <label for="name">Name:</label>
+            <input name="name" id="name" placeholder="your name" type="text"/>
+
+            <label for="email">Email</label>
+            <input type="email" name="email" placeholder="your email: Ex, you@your-domain.com" id="email">
+
+            <label for="message">Message</label>
+            <textarea style="min-height: 100px;" placeholder="What's on your mind?" type="text" name="message"  id="message"></textarea>
+            <input type="hidden" name="to" value="ohidurbappy@gmail.com">
+            <input type="submit" value="Submit">
+        
+
+        </form>
+        </div>
+
+
+
+        <div class="api">
+            <h3>Instructions:</h3>
+            To use this api just include the js library<br>
+            <br>
+            <span style="color: #046b51;">https://to-mail.web.app/tomail.js</span><br>
+            <br>
+            and make a POST request with the required field:,<br>
+            
+            <u>Fields - Description</u><br>
+            to - the email address to send mail to
+
+
+        </div>
+    
+
+    </div>
+
+    <div class="footer">
+
+        Copyright&copy;ToMail
+
+    </div>
+</body>
+</html>
