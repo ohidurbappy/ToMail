@@ -1,4 +1,6 @@
 {
-    "email":"you@email-provider.com",
-    "password":"your-very-funny-password"
+    "mailjet_username":"MAILJET_USERNAME",
+    "mailjet_password":"MAILJET_PASSWORD",
+    "mailjet_from_email":"MAILJET_FROM_EMAIL",
+    "mailjet_from_name":"MAILJET_FROM_NAME"
 }

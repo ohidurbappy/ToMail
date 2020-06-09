@@ -95,14 +95,18 @@
         <form action="/send" method="POST">
         
             <label for="name">Name:</label>
-            <input name="name" id="name" placeholder="your name" type="text"/>
+            <input name="name" id="name" placeholder="your name" minlength="4" type="text"/>
 
             <label for="email">Email</label>
             <input type="email" name="email" placeholder="your email: Ex, you@your-domain.com" id="email">
 
             <label for="message">Message</label>
-            <textarea style="min-height: 100px;" placeholder="What's on your mind?" type="text" name="message"  id="message"></textarea>
-            <input type="hidden" name="to" value="ohidurbappy@gmail.com">
+            <textarea style="min-height: 100px;" minlength="30" placeholder="What's on your mind?" type="text" name="message"  id="message"></textarea>
+            
+            <input type="hidden" value="General Query" name="subject">
+
+            <input type="hidden" name="to_name" value="Ohidur">
+            <input type="hidden" name="to_email" value="ohidurbappy@gmail.com">
             <input type="submit" value="Submit">
         
 

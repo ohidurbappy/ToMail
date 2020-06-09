@@ -1,115 +1,165 @@
 const functions = require('firebase-functions');
-const express=require('express');
+const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const fs = require('fs');
 const nodemailer = require('nodemailer');
+const {check,validationResult}=require('express-validator');
 
-const app=express();
+const app = express();
+
+// to allow cross origin
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  next();
+});
 
 app.use(bodyParser.urlencoded({
-    extended: true
-  }));
+  extended: true
+}));
 // app.use(multer({ dest: '/tmp/'}));
 app.use(cookieParser());
 
 
-app.get('/api',(request,response)=>{
-    response.send({
-        status:"ok",
-        message:"The app is working properly"
-    })
+app.get('/api', (request, response) => {
+  response.send({
+    status: "ok",
+    message: "The app is working properly"
+  })
 });
 
 
-app.post('/send',(req,res)=>{
+// send with mailjet
+app.post('/send',[
+  check('to_email').isEmail(),
+  check('to_name').isAlpha().isLength({min:3}),
+  check('email').isEmail(),
+  check('name').isAlpha().isLength({min:3}),
+  check('message').isLength({min:25}),
+  check('subject').isLength({min:5})
+
+], (req, res) => {
+
+  console.log("Received a POST request on the /send endpoint")
+  // res.end(JSON.stringify(req.body))
 
 
-    console.log("Received a POST request on the /send endpoint")
-    // res.end(JSON.stringify(req.body))
-    var to_mail = req.body.to;
-    var s_email = req.body.email;
-    var s_name = req.body.name;
-    var s_message = req.body.message;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
 
-    var s_subject="ToMail Notification";
+  var to_email = req.body.to_email;
+  var to_name=req.body.to_name;
+  var s_email = req.body.email;
+  var s_name = req.body.name;
+  var s_message = req.body.message;
+  var s_subject = req.body.subject;
 
-    if(req.body.subject || req.body.subject!=''){
-        s_subject="ToMail Notification";
-    }
-  
-    let app_email;
-    let app_password;
+  s_subject='✉️'+s_subject;
 
+  let mailjet_username;
+  let mailjet_password;
+  let mailjet_from_email;
+  let mailjet_from_name;
 
-    // geting the config file
-  fs.readFile(__dirname + "/config.json", 'utf8', function (err, data) {
-    var config = JSON.parse(data);
-    app_email = config['email'];
-    app_password=config['password'];
-
-
-    var transporter = nodemailer.createTransport({
-      host:'smtp.yandex.com',
-      port:465,
-      secure:true,
-      auth: {
-        type:'login',
-        user: app_email,
-        pass:app_password
-      }
-    });
-
-    var mailOptions = {
-      from:`ToMail <${app_email}>`,
-      to:`Ohidur <${to_mail}>`,
-      replyTo:s_email,
-      subject: s_subject,
-      text:`
-      Messsage:${s_message} from ${s_name} Reply to ${s_email}`,
-      html: `
-        <h2>
-        ToMail Notification
+  var txtMessage = `Messsage:${s_message} from ${s_name} Reply to ${s_email}`;
+  var htmlMessage = `
+        <div style="background-color:#c1c1c1;padding:20px">
+        <h2 style="padding:8px;background-color:black;color:white;text-align:center;">
+        ToMail
         </h2>
-        <div>
+
+        <div style="background-color:#ffffff;">
         <span><b>From:</b> ${s_name} </span><br>
         <span><b>Reply-to:</b> ${s_email} </span><br>
         <spn><b>Subject:</b> ${s_subject} </span><br>
         <span><b><u>Message</u></b></span><br>
-        <pre>
+        <p>
         ${s_message}
-        </pre>
+        </p>
         </div>
+
+
         <br>
         <br>
-        <span>Mailed by: <a href="https://to-mail.web.app">ToMail</a></span>
-        <span style="color:red;">Thank you</span>`
-    }
+        <span>Mailed by: <a href="https://to-mail.web.app">ToMail</a></span></div>`;
 
 
 
-    // now send the email
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error.message)
+  // geting the config file
+  fs.readFile(__dirname + "/config.json", 'utf8', function (err, data) {
+    var config = JSON.parse(data);
+    mailjet_username = config['mailjet_username'];
+    mailjet_password = config['mailjet_password'];
+    mailjet_from_email = config['mailjet_from_email'];
+    mailjet_from_name = config['mailjet_from_name'];
+
+    const mailjet = require('node-mailjet')
+    .connect(mailjet_username, mailjet_password);
+
+    const request = mailjet
+      .post("send", {
+        'version': 'v3.1'
+      })
+      .request({
+        Headers: { 'Reply-To': 'copilot@mailjet.com' },
+        "Messages": [{
+          "From": {
+            "Email": mailjet_from_email,
+            "Name": mailjet_from_name
+          },
+          "To": [{
+              "Email": to_email,
+              "Name":to_name
+            }
+
+          ],
+          "Subject": s_subject,
+          "TextPart": txtMessage,
+          "HTMLPart": htmlMessage,
+          "CustomID": "ToMailNotification"
+        }]
+      })
+    request
+      .then((result) => {
+        console.log(result.body);
+
+        mResponse=result.body;
+
+        if (mResponse.Messages[0].Status == "success") {
+
+          res.send({
+            status: 'ok',
+            msg: 'Email sent.'
+          });
+
+          
+
+
+        } else {
+
+          res.send({
+            status: 'error',
+            msg: 'Email could not be sent.'
+          })
+
+        }
+
+      })
+      .catch((err) => {
+        console.log(err.statusCode);
+
         res.send({
           status: 'error',
-          msg: 'Email sending failed'
+          msg: 'Email not sent'
         })
-      } else {
-        console.log('Message %s sent: %s', info.messageId, info.response);
-        res.send({
-          status: 'ok',
-          msg: 'Email sent'
-        })
-      }
 
-      transporter.close();
-
-    });
+      })
 
   });
 
 })
+
 
 exports.app = functions.https.onRequest(app);

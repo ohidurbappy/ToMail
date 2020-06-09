@@ -9,7 +9,6 @@ function sendToMail(f){
         xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
     } 
 
-
     xmlhttp.onreadystatechange=function(){
         if (this.readyState == 4 && this.status == 200) {
 
@@ -31,10 +30,6 @@ function sendToMail(f){
                 </div>`;
             }
             
-            
-
-
-            
           }else{
 
             document.getElementById("tomailform").innerHTML = `
@@ -49,12 +44,7 @@ function sendToMail(f){
     xmlhttp.open("POST","https://to-mail.web.app/send",true)
     xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xmlhttp.send(f);
-    
-
     console.log("Sending Request...")
-
     return false;
-
-    
 
 }
