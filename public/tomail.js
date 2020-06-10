@@ -32,6 +32,11 @@ function sendToMail(f){
             
           }else{
 
+
+            if(this.status==422){
+                console.log(this.responseText);
+            }
+
             document.getElementById("tomailform").innerHTML = `
                 <div><h2 style="color:blue;font-size:32px;text-align:center;">Please Wait...</h2>
                 <p style="color:#c1c1c1;text-align:center;">While form is being submit</p>

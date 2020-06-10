@@ -31,12 +31,12 @@ app.get('/api', (request, response) => {
 
 // send with mailjet
 app.post('/send',[
-  check('to_email').isEmail(),
-  check('to_name').isAlpha().isLength({min:3}),
-  check('email').isEmail(),
-  check('name').isAlpha().isLength({min:3}),
-  check('message').isLength({min:25}),
-  check('subject').isLength({min:5})
+  check('to_email').exists().isEmail(),
+  check('to_name').exists().isAlpha().isLength({min:3}),
+  check('email').exists().isEmail(),
+  check('name').exists().isAlpha().isLength({min:3}),
+  check('message').exists().isLength({min:25}),
+  check('subject').exists().isLength({min:5})
 
 ], (req, res) => {
 
